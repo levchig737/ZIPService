@@ -1,9 +1,9 @@
 [tool.poetry]
-name = "forum"
+name = "src"
 version = "0.1.0"
 description = ""
-authors = ["Your Name <you@example.com>"]
-readme = "README.md"
+authors = ["Chekarev Lev <you@example.com>"]
+readme = "Readme.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"

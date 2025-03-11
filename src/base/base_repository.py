@@ -1,8 +1,6 @@
 import abc
 from typing import Any, Generic, Iterable, Optional, TypeVar
 
-from fastapi_pagination import Page
-from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy import Delete, Insert, Select, Update
 from sqlalchemy.ext.asyncio import AsyncSession
 
