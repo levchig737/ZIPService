@@ -9,4 +9,5 @@ class Settings(BaseSettings):
     DB_NAME: str
     DB_USER: str
     DB_PASS: str
+    POSTGRES_PASSWORD: str
     SECRET: str
