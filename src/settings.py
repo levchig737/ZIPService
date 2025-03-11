@@ -10,4 +10,10 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASS: str
     POSTGRES_PASSWORD: str
+
+    MINIO_NAME: str
+    MINIO_PORT: str
+    MINIO_ACCESS_KEY: str
+    MINIO_SECRET_KEY: str
+
     SECRET: str

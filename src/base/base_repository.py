@@ -14,9 +14,6 @@ class BaseRepository(abc.ABC, Generic[T]):
     async def all(self, statement: Select | Delete | Update | Insert) -> Iterable[Any]:
         return (await self.session.execute(statement)).scalars().all()
 
-    async def paginate(self, statement: Select, **kwargs: Any) -> Page:
-        return await paginate(self.session, statement, **kwargs)
-
     async def one_or_none(
         self, statement: Select | Delete | Update | Insert
     ) -> Optional[Any]:
