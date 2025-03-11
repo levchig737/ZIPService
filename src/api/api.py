@@ -1,6 +1,9 @@
 from fastapi import APIRouter
-from api.endpoints.user import router as user_router
+from starlette.responses import JSONResponse
 
 router = APIRouter()
 
-router.include_router(user_router, prefix="/users", tags=["users"])
+@router.get("/check_startup/")
+async def check_startup() -> JSONResponse:
+    return JSONResponse(status_code=204, content=None)
+
