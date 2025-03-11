@@ -1,0 +1,25 @@
+from typing_extensions import Optional
+
+from base.base_repository import BaseRepository
+from logging import getLogger
+from sqlalchemy import select
+
+from task.models import Task
+
+logger = getLogger("api")
+
+
+class TaskRepository(BaseRepository):
+    async def create(self, task: Task) -> None:
+        await self.save(task)
+
+    async def get(self, task_id: str) -> Optional[Task]:
+        statement = select(Task).where(task_id == Task.task_id)
+        return await self.one_or_none(statement)
+
+    async def update(self, task: Task, updated_task: Task) -> None:
+        updated_task.task_id = task.task_id
+        await self.save(updated_task)
+
+    async def delete(self, task: Task) -> None:
+        await self.remove(task)
