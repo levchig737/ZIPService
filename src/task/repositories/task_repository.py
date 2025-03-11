@@ -17,9 +17,8 @@ class TaskRepository(BaseRepository):
         statement = select(Task).where(task_id == Task.task_id)
         return await self.one_or_none(statement)
 
-    async def update(self, task: Task, updated_task: Task) -> None:
-        updated_task.task_id = task.task_id
-        await self.save(updated_task)
+    async def update(self, task: Task) -> None:
+        await self.save(task)
 
     async def delete(self, task: Task) -> None:
         await self.remove(task)
