@@ -112,12 +112,12 @@ class TaskService:
         await self.create_task(task_id, file, session)
 
         # Запуск фоновой обработки
-        if background_tasks:
-            async def wrapped_process_task(task_id: str):
-                async with async_session() as new_session:
-                    await self.process_task(task_id, new_session)
-                    await new_session.commit()
-            background_tasks.add_task(wrapped_process_task, task_id)
-            logger.info(f"Фоновая задача добавлена для {task_id}")
+        async def wrapped_process_task(task_id: str):
+            async with async_session() as new_session:
+                await self.process_task(task_id, new_session)
+                await new_session.commit()
+
+        background_tasks.add_task(wrapped_process_task, task_id)
+        logger.info(f"Фоновая задача добавлена для {task_id}")
 
         return TaskResponse(task_id=task_id)
