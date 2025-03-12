@@ -1,5 +1,5 @@
 from task.schemas.task import (TaskResultResponse, TaskResponse, CheckResult,
-                               Vulnerabilities, CodeSmells, Bugs)
+                               Vulnerabilities, CodeSmells, Bugs, SonarQubeResults)
 
 __all__ = [
     "TaskResultResponse",
@@ -7,5 +7,6 @@ __all__ = [
     "CheckResult",
     "Vulnerabilities",
     "CodeSmells",
-    "Bugs"
+    "Bugs",
+    "SonarQubeResults"
 ]

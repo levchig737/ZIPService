@@ -3,7 +3,6 @@ from typing import Optional
 
 from task.enums.TaskStatus import TaskStatus
 
-
 class Bugs(BaseModel):
     total: int
     critical: int
@@ -28,9 +27,12 @@ class CheckResult(BaseModel):
     code_smells: CodeSmells
     vulnerabilities: Vulnerabilities
 
+class SonarQubeResults(BaseModel):
+    sonarqube: CheckResult
+
 class TaskResponse(BaseModel):
     task_id: str
 
 class TaskResultResponse(BaseModel):
     status: TaskStatus
-    results: Optional[CheckResult] = None
+    results: Optional[SonarQubeResults] = None
