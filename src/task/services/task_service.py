@@ -24,8 +24,11 @@ class TaskService:
         self.task_repo = task_repo
         self.storage_repo = storage_repo
 
-    async def create_task(self, task_id: str, file: UploadFile, session: AsyncSession) -> None:
+    async def create_task(self, task_id: str, file: UploadFile, session: AsyncSession = None) -> None:
         logger.info(f"Создание задачи с id: {task_id}")
+
+        if session is not None:
+            self.task_repo.session = session
 
         # Валидация размера файла
         file_size = file.size
@@ -59,16 +62,17 @@ class TaskService:
         # Создание задачи в базе данных
         task = Task(task_id=task_id, file_path=file_name, status=TaskStatus.PENDING)
         try:
-            self.task_repo.session = session
             await self.task_repo.create(task)
         except Exception as e:
             logger.error(f"Ошибка создания задачи в базе данных: {str(e)}")
             raise ProcessingException(message=f"Ошибка создания задачи: {str(e)}")
         logger.info(f"Задача {task_id} создана в базе данных со статусом: {task.status}")
 
-    async def process_task(self, task_id: str, session: AsyncSession) -> None:
-        task_repo = TaskRepository(session)
-        task = await task_repo.get(task_id)
+    async def process_task(self, task_id: str, session: AsyncSession = None) -> None:
+        if session is not None:
+            self.task_repo.session = session
+
+        task = await self.task_repo.get(task_id)
         if not task:
             logger.error(f"Задача {task_id} не найдена")
             return
@@ -76,7 +80,7 @@ class TaskService:
         # Обновление статуса на IN_PROGRESS
         task.status = TaskStatus.IN_PROGRESS
         try:
-            await task_repo.update(task)
+            await self.task_repo.update(task)
         except Exception as e:
             logger.error(f"Ошибка обновления статуса задачи: {str(e)}")
             raise ProcessingException(message=f"Ошибка обновления статуса: {str(e)}")
@@ -96,17 +100,19 @@ class TaskService:
         task.results = json.dumps(results)
         task.status = TaskStatus.SUCCESS
         try:
-            await task_repo.update(task)
+            await self.task_repo.update(task)
         except Exception as e:
             logger.error(f"Ошибка сохранения результатов: {str(e)}")
             raise ProcessingException(message=f"Ошибка сохранения результатов: {str(e)}")
         logger.info(f"Задача {task_id} обработана и обновлена до SUCCESS с результатами: {results}")
 
-    async def get_task_result(self, task_id: str, session: AsyncSession) -> Optional[TaskResultResponse]:
+    async def get_task_result(self, task_id: str, session: AsyncSession = None) -> Optional[TaskResultResponse]:
         logger.info(f"Получение результата для task_id: {task_id}")
 
-        task_repo = TaskRepository(session)
-        task = await task_repo.get(task_id)
+        if session is not None:
+            self.task_repo.session = session
+
+        task = await self.task_repo.get(task_id)
         if not task:
             logger.error(f"Задача {task_id} не найдена")
             raise TaskNotFoundException()
@@ -149,13 +155,13 @@ class TaskService:
         await self.create_task(task_id, file, session)
 
         # Запуск фоновой обработки
-        async def wrapped_process_task(task_id: str):
+        async def wrapped_process_task(task_id_wrap: str):
             async with async_session() as new_session:
                 try:
-                    await self.process_task(task_id, new_session)
+                    await self.process_task(task_id_wrap, new_session)
                     await new_session.commit()
                 except Exception as e:
-                    logger.error(f"Ошибка в фоновой задаче для {task_id}: {str(e)}")
+                    logger.error(f"Ошибка в фоновой задаче для {task_id_wrap}: {str(e)}")
                     await new_session.rollback()
                     raise ProcessingException(message=f"Ошибка обработки задачи: {str(e)}")
 
