@@ -18,10 +18,7 @@ class StorageRepository:
     async def save_file(self, file: UploadFile, file_name: str) -> None:
         file_content = await file.read()
         self.minio_client.put_object(
-            self.bucket_name,
-            file_name,
-            io.BytesIO(file_content),
-            len(file_content)
+            self.bucket_name, file_name, io.BytesIO(file_content), len(file_content)
         )
 
     def get_file(self, file_name: str) -> bytes:

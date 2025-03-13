@@ -15,6 +15,7 @@ asyncpg = "^0.30.0"
 uvicorn = "^0.34.0"
 minio = "^7.2.0"
 python-multipart = "^0.0.20"
+ruff = "^0.9.10"
 
 
 [build-system]

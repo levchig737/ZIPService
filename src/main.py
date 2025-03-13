@@ -6,7 +6,9 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from api.api import router as api_router
 from task.api.api import router as task_router
-from task.exceptions.task_middleware import exception_traceback_middleware as task_exception_traceback_middleware
+from task.exceptions.task_middleware import (
+    exception_traceback_middleware as task_exception_traceback_middleware,
+)
 
 origins = [
     "*",

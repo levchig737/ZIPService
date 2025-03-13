@@ -1,5 +1,6 @@
 from typing import Optional
 
+
 class BaseExceptionWithMessage(Exception):
     status_code: int
     message: str

@@ -3,11 +3,13 @@ from typing import Optional
 
 from task.enums.TaskStatus import TaskStatus
 
+
 class Bugs(BaseModel):
     total: int
     critical: int
     major: int
     minor: int
+
 
 class CodeSmells(BaseModel):
     total: int
@@ -15,11 +17,13 @@ class CodeSmells(BaseModel):
     major: int
     minor: int
 
+
 class Vulnerabilities(BaseModel):
     total: int
     critical: int
     major: int
     minor: int
+
 
 class CheckResult(BaseModel):
     overall_coverage: float
@@ -27,11 +31,14 @@ class CheckResult(BaseModel):
     code_smells: CodeSmells
     vulnerabilities: Vulnerabilities
 
+
 class SonarQubeResults(BaseModel):
     sonarqube: CheckResult
 
+
 class TaskResponse(BaseModel):
     task_id: str
+
 
 class TaskResultResponse(BaseModel):
     status: TaskStatus

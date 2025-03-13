@@ -1,12 +1,15 @@
 from task.exceptions.task import (
-    InvalidFileException, FileSizeExceededException, ZipValidationException,
-    TaskNotFoundException, ProcessingException
-    )
+    InvalidFileException,
+    FileSizeExceededException,
+    ZipValidationException,
+    TaskNotFoundException,
+    ProcessingException,
+)
 
 __all__ = [
     "InvalidFileException",
     "FileSizeExceededException",
     "ZipValidationException",
     "TaskNotFoundException",
-    "ProcessingException"
+    "ProcessingException",
 ]
