@@ -76,7 +76,7 @@ class TaskService:
         # Обновление статуса на IN_PROGRESS
         task.status = TaskStatus.IN_PROGRESS
         try:
-            await task_repo.update(task)
+            await self.task_repo.update(task)
         except Exception as e:
             logger.error(f"Ошибка обновления статуса задачи: {str(e)}")
             raise ProcessingException(message=f"Ошибка обновления статуса: {str(e)}")
@@ -96,7 +96,7 @@ class TaskService:
         task.results = json.dumps(results)
         task.status = TaskStatus.SUCCESS
         try:
-            await task_repo.update(task)
+            await self.task_repo.update(task)
         except Exception as e:
             logger.error(f"Ошибка сохранения результатов: {str(e)}")
             raise ProcessingException(message=f"Ошибка сохранения результатов: {str(e)}")
