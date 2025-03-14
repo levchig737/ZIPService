@@ -16,4 +16,14 @@ class Settings(BaseSettings):
     MINIO_ACCESS_KEY: str
     MINIO_SECRET_KEY: str
 
+    KEYCLOAK_ADMIN: str
+    KEYCLOAK_ADMIN_PASSWORD: str
+    KC_DB: str
+    KC_DB_URL: str
+    KC_DB_USERNAME: str
+    KC_DB_PASSWORD: str
+    KC_HOSTNAME: str
+    KC_PORT: str
+
+    KEYCLOAK_CLIENT_SECRET: str
     SECRET: str

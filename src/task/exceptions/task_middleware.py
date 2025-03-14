@@ -11,6 +11,7 @@ from task.exceptions import (
     ZipValidationException,
     TaskNotFoundException,
     ProcessingException,
+    AccessDeniedException
 )
 
 logger = getLogger("api")
@@ -43,6 +44,12 @@ async def exception_traceback_middleware(
         )
     except ProcessingException as e:
         logger.error(f"Processing error: {e.message}")
+        return JSONResponse(
+            status_code=e.status_code,
+            content={"detail": e.message},
+        )
+    except AccessDeniedException as e:
+        logger.error(f"AccessDeniedException: {e.message}")
         return JSONResponse(
             status_code=e.status_code,
             content={"detail": e.message},

@@ -4,6 +4,7 @@ from task.exceptions.task import (
     ZipValidationException,
     TaskNotFoundException,
     ProcessingException,
+    AccessDeniedException
 )
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "ZipValidationException",
     "TaskNotFoundException",
     "ProcessingException",
+    "AccessDeniedException"
 ]

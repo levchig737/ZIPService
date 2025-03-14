@@ -34,6 +34,24 @@ services:
     networks:
       - zip_service-network
 
+  keycloak:
+    image: keycloak/keycloak:26.1
+    container_name: keycloak
+    env_file:
+      - .env
+    command: start-dev --db=${KC_DB} --db-url=${KC_DB_URL} --db-username=${KC_DB_USERNAME} --db-password=${KC_DB_PASSWORD} --hostname=${KC_HOSTNAME}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zip_service-network
 volumes:
   zip_service-pg:
 

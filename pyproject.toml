@@ -22,6 +22,7 @@ testcontainers-postgres = "^0.0.1rc1"
 testcontainers-minio = "^0.0.1rc1"
 testcontainers = "^4.9.2"
 psycopg2-binary = "^2.9.10"
+python-keycloak = "^5.3.1"
 
 
 [build-system]

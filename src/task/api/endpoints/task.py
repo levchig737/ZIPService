@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, UploadFile, Depends, BackgroundTasks, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from task.api.deps import get_task_service
+from task.api.deps import get_task_service, get_current_user
 from task.schemas import TaskResponse, TaskResultResponse
 from task.services.task_service import TaskService
 from base.base import get_async_session
@@ -12,6 +12,7 @@ router = APIRouter()
 logger = logging.getLogger("api")
 
 TaskServiceDeps = Annotated[TaskService, Depends(get_task_service)]
+UserDeps = Annotated[dict, Depends(get_current_user)]
 
 
 @router.post("/upload", response_model=TaskResponse, status_code=201)
