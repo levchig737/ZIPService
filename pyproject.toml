@@ -16,6 +16,12 @@ uvicorn = "^0.34.0"
 minio = "^7.2.0"
 python-multipart = "^0.0.20"
 ruff = "^0.9.10"
+pytest = "^8.3.5"
+pytest-asyncio = "^0.25.3"
+testcontainers-postgres = "^0.0.1rc1"
+testcontainers-minio = "^0.0.1rc1"
+testcontainers = "^4.9.2"
+psycopg2-binary = "^2.9.10"
 
 
 [build-system]
