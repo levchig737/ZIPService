@@ -17,6 +17,7 @@ UserDeps = Annotated[dict, Depends(get_current_user)]
 
 cache_namespace = "TASK"
 
+
 @router.post("/upload", response_model=TaskResponse, status_code=201)
 async def upload_file(
     file: UploadFile,
@@ -29,7 +30,7 @@ async def upload_file(
 
 
 @router.get("/results/{task_id}", response_model=TaskResultResponse)
-# @cache(namespace=cache_namespace, expire=60)
+@cache(namespace=cache_namespace, expire=60)
 async def get_results(
     task_id: str,
     task_service: TaskServiceDeps,

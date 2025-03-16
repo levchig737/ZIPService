@@ -24,7 +24,9 @@ class StorageRepository:
 
     async def get_file(self, file_name: str) -> bytes:
         loop = asyncio.get_running_loop()
-        response = await loop.run_in_executor(None, lambda: self.minio_client.get_object(self.bucket_name, file_name))
+        response = await loop.run_in_executor(
+            None, lambda: self.minio_client.get_object(self.bucket_name, file_name)
+        )
         try:
             file_content = response.read()  # Читаем содержимое потока внутри метода
             return file_content

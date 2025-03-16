@@ -26,10 +26,16 @@ from task.schemas import TaskResultResponse, TaskResponse
 
 logger = logging.getLogger("api")
 
+
 class TaskService:
     MAX_FILE_SIZE = 100 * 1024 * 1024
 
-    def __init__(self, storage_repo: StorageRepository, task_repo: TaskRepository, sonarqube_service: SonarqubeService):
+    def __init__(
+        self,
+        storage_repo: StorageRepository,
+        task_repo: TaskRepository,
+        sonarqube_service: SonarqubeService,
+    ):
         self.task_repo = task_repo
         self.storage_repo = storage_repo
         self.sonarqube_service = sonarqube_service
@@ -99,7 +105,7 @@ class TaskService:
         # Обновление статуса на IN_PROGRESS
         task.status = TaskStatus.IN_PROGRESS
 
-        # await FastAPICache.clear(namespace=self.cache_namespace)
+        await FastAPICache.clear(namespace=self.cache_namespace)
 
         try:
             await self.task_repo.update(task)
@@ -110,7 +116,9 @@ class TaskService:
 
         # Получение содержимого ZIP-файла из MinIO
         try:
-            file_content = await self.storage_repo.get_file(f"{task_id}.zip")  # file_content уже bytes
+            file_content = await self.storage_repo.get_file(
+                f"{task_id}.zip"
+            )  # file_content уже bytes
         except Exception as e:
             logger.error(f"Ошибка получения файла из MinIO: {str(e)}")
             raise ProcessingException(message=f"Ошибка получения файла: {str(e)}")
@@ -125,6 +133,8 @@ class TaskService:
         # Сохранение результатов
         task.results = json.dumps(results.dict())  # Преобразуем словарь в строку
         task.status = TaskStatus.SUCCESS
+        await FastAPICache.clear(namespace=self.cache_namespace)
+
         try:
             await self.task_repo.update(task)
         except Exception as e:

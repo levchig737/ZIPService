@@ -1,9 +1,3 @@
-from task.schemas.task import (
-    TaskResultResponse,
-    TaskResponse
-)
+from task.schemas.task import TaskResultResponse, TaskResponse
 
-__all__ = [
-    "TaskResultResponse",
-    "TaskResponse"
-]
+__all__ = ["TaskResultResponse", "TaskResponse"]

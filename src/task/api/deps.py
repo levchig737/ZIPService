@@ -22,8 +22,10 @@ async def get_minio_client() -> Minio:
         secure=False,
     )
 
+
 async def get_sonarqube_service() -> SonarqubeService:
     return SonarqubeService()
+
 
 async def get_storage_repository(
     minio_client: Minio = Depends(get_minio_client),
@@ -40,10 +42,13 @@ async def get_task_repository(
 async def get_task_service(
     storage_repo: StorageRepository = Depends(get_storage_repository),
     task_repo: TaskRepository = Depends(get_task_repository),
-    sonarqube_service: SonarqubeService = Depends(get_sonarqube_service)
+    sonarqube_service: SonarqubeService = Depends(get_sonarqube_service),
 ) -> TaskService:
-    return TaskService(storage_repo=storage_repo, task_repo=task_repo, sonarqube_service=sonarqube_service)
-
+    return TaskService(
+        storage_repo=storage_repo,
+        task_repo=task_repo,
+        sonarqube_service=sonarqube_service,
+    )
 
 
 async def get_current_user(token: str = Security(oauth2_scheme)) -> dict:

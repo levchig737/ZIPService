@@ -7,9 +7,17 @@ from typing import Tuple, Optional
 
 from dotenv import load_dotenv
 from fastapi import UploadFile, BackgroundTasks
+from fastapi_cache import FastAPICache
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from gateways.sonarqube import SonarQubeResults, CheckResult, Vulnerabilities, CodeSmells, Bugs
+from gateways.sonarqube import (
+    SonarQubeResults,
+    CheckResult,
+    Vulnerabilities,
+    CodeSmells,
+    Bugs,
+)
+
 # Импорт исключений и классов схем
 from task.exceptions import (
     FileSizeExceededException,
@@ -49,14 +57,21 @@ def task_service() -> Tuple[TaskService, MagicMock, MagicMock]:
     # Замокаем асинхронные методы с помощью AsyncMock
     storage_repo.get_file = AsyncMock(return_value=create_valid_zip_bytes())
     storage_repo.save_file = AsyncMock()
-    sonarqube_service.check_zip = AsyncMock(return_value=SonarQubeResults(
-        sonarqube=CheckResult(
-            overall_coverage=85.5,
-            bugs=Bugs(total=12, critical=2, major=5, minor=5),
-            code_smells=CodeSmells(total=20, critical=3, major=10, minor=7),
-            vulnerabilities=Vulnerabilities(total=4, critical=1, major=2, minor=1),
+    sonarqube_service.check_zip = AsyncMock(
+        return_value=SonarQubeResults(
+            sonarqube=CheckResult(
+                overall_coverage=85.5,
+                bugs=Bugs(total=12, critical=2, major=5, minor=5),
+                code_smells=CodeSmells(total=20, critical=3, major=10, minor=7),
+                vulnerabilities=Vulnerabilities(total=4, critical=1, major=2, minor=1),
+            )
         )
-    ))
+    )
+
+    # Инициализация FastAPICache с замоканным Redis-бэкендом
+    mock_redis = AsyncMock()
+    mock_redis.delete = AsyncMock(return_value=1)  # Замокаем метод delete для clear
+    FastAPICache.init(backend=mock_redis, prefix="test_prefix")
 
     service = TaskService(storage_repo, task_repo, sonarqube_service)
     return service, storage_repo, task_repo

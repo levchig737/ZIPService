@@ -2,10 +2,12 @@ import io
 import logging
 import os
 import zipfile
+from unittest.mock import AsyncMock
 
 import pytest
 from alembic import command
 from alembic.config import Config
+from fastapi_cache import FastAPICache
 from minio import Minio
 from testcontainers.core.waiting_utils import wait_for_logs
 from testcontainers.minio import MinioContainer
@@ -85,6 +87,9 @@ def setup_containers(request):
     os.environ["KEYCLOAK_REDIRECT_URI"] = "http://localhost:8000"
     os.environ["KEYCLOAK_CLIENT_SECRET"] = "test_secret"
     os.environ["KEYCLOAK_PUBLIC_URL"] = "http://localhost:8000"
+    os.environ["REDIS_HOST"] = "localhost"
+    os.environ["REDIS_PORT"] = "6379"
+    os.environ["REDIS_PASSWORD"] = "your_secure_password"
 
     # Применение миграций Alembic
     alembic_ini_path = os.path.join(os.path.dirname(__file__), "../alembic.ini")
@@ -122,6 +127,11 @@ async def client():
     from main import app
     from httpx import AsyncClient, ASGITransport
     from task.api.deps import get_current_user
+
+    # Инициализация FastAPICache с замоканным Redis-бэкендом
+    mock_redis = AsyncMock()
+    mock_redis.delete = AsyncMock(return_value=1)  # Замокаем метод delete для clear
+    FastAPICache.init(backend=mock_redis, prefix="test_prefix")
 
     # Мок для get_current_user
     async def mock_get_current_user():

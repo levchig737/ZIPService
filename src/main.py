@@ -5,6 +5,7 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from api.api import router as api_router
+from base.lifespan import lifespan
 from task.api.api import router as task_router
 from task.exceptions.task_middleware import (
     exception_traceback_middleware as task_exception_traceback_middleware,
@@ -18,9 +19,7 @@ logger = getLogger("api")
 logging.basicConfig()
 logger.setLevel(logging.DEBUG)
 
-app = FastAPI(
-    Title="ZIPService",
-)
+app = FastAPI(Title="ZIPService", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,  # noqa

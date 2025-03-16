@@ -33,3 +33,7 @@ class Settings(BaseSettings):
 
     KEYCLOAK_CLIENT_SECRET: str
     SECRET: str
+
+    REDIS_HOST: str
+    REDIS_PORT: str
+    REDIS_PASSWORD: str

@@ -64,6 +64,8 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     command: bash -c "while !</dev/tcp/db/5432; do sleep 1; done; sleep 2; alembic upgrade head && uvicorn main:app --host ${APP_HOST} --port ${APP_PORT}"
     healthcheck:
       test: bash -c "</dev/tcp/app/${APP_PORT}"
@@ -72,6 +74,23 @@ services:
       retries: 5
     networks:
       zip_service-network:
+
+  redis:
+    image: redis:7.0
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zip_service-network
+
 volumes:
   zip_service-pg:
 

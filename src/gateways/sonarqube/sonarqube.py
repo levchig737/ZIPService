@@ -1,8 +1,15 @@
 import logging
 
-from gateways.sonarqube import CheckResult, Bugs, CodeSmells, Vulnerabilities, SonarQubeResults
+from gateways.sonarqube import (
+    CheckResult,
+    Bugs,
+    CodeSmells,
+    Vulnerabilities,
+    SonarQubeResults,
+)
 
 logger = logging.getLogger("api")
+
 
 class SonarqubeService:
     async def check_zip(self, zip_file: bytes) -> SonarQubeResults:
@@ -16,7 +23,7 @@ class SonarqubeService:
             SonarQubeResults: Результаты анализа в формате Pydantic-схемы.
         """
         logger.info("Запуск фиктивного анализа SonarQube для ZIP-файла")
-        #TODO запрос и получение данных у внешнего сервиса
+        # TODO запрос и получение данных у внешнего сервиса
 
         # Формируем фиктивные результаты в формате Pydantic-схем
         check_result = CheckResult(
