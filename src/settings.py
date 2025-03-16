@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     KC_PORT: str
 
     KEYCLOAK_SERVER_URL: str
+    KEYCLOAK_PUBLIC_URL: str
     KEYCLOAK_REALM: str
     KEYCLOAK_CLIENT_ID: str
     KEYCLOAK_REDIRECT_URI: str

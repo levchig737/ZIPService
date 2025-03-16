@@ -39,7 +39,7 @@ services:
     container_name: keycloak
     env_file:
       - .env
-    command: start-dev --db=${KC_DB} --db-url=${KC_DB_URL} --db-username=${KC_DB_USERNAME} --db-password=${KC_DB_PASSWORD} --hostname=${KC_HOSTNAME} --import-realm
+    command: start-dev --db=${KC_DB} --db-url=${KC_DB_URL} --db-username=${KC_DB_USERNAME} --db-password=${KC_DB_PASSWORD} --hostname=localhost --hostname-strict=false --import-realm
     ports:
       - "8080:8080"
     volumes:
@@ -47,13 +47,31 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - zip_service-network
+
+  app:
+    build:
+      context: .
+    restart: always
+    env_file:
+      - .env
+    container_name: zip_service_app
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    depends_on:
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    command: bash -c "while !</dev/tcp/db/5432; do sleep 1; done; sleep 2; alembic upgrade head && uvicorn main:app --host ${APP_HOST} --port ${APP_PORT}"
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ready" ]
+      test: bash -c "</dev/tcp/app/${APP_PORT}"
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - zip_service-network
+      zip_service-network:
 volumes:
   zip_service-pg:
 

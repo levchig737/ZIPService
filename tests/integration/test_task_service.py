@@ -84,6 +84,7 @@ def setup_containers(request):
     os.environ["KEYCLOAK_CLIENT_ID"] = "test_client"
     os.environ["KEYCLOAK_REDIRECT_URI"] = "http://localhost:8000"
     os.environ["KEYCLOAK_CLIENT_SECRET"] = "test_secret"
+    os.environ["KEYCLOAK_PUBLIC_URL"] = "http://localhost:8000"
 
     # Применение миграций Alembic
     alembic_ini_path = os.path.join(os.path.dirname(__file__), "../alembic.ini")
