@@ -40,6 +40,7 @@ async def get_task_service(
 ) -> TaskService:
     return TaskService(storage_repo=storage_repo, task_repo=task_repo)
 
+
 async def get_current_user(token: str = Security(oauth2_scheme)) -> dict:
     try:
         userinfo = keycloak_openid.userinfo(token)

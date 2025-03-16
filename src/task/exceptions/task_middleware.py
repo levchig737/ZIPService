@@ -11,7 +11,7 @@ from task.exceptions import (
     ZipValidationException,
     TaskNotFoundException,
     ProcessingException,
-    AccessDeniedException
+    AccessDeniedException,
 )
 
 logger = getLogger("api")

@@ -26,6 +26,7 @@ class ProcessingException(BaseExceptionWithMessage):
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     message = "Ошибка обработки задачи"
 
+
 class AccessDeniedException(BaseExceptionWithMessage):
     status_code = status.HTTP_401_UNAUTHORIZED
     message = "Invalid authentication credentials"
