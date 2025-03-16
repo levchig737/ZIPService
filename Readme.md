@@ -56,13 +56,13 @@ git clone https://github.com/levchig737/ZIPService.git
 cd ZIPService
 ```
 
-2. Запуск в контейнере
+2. Скопируйте настройки окружения из **.env-local** в **.env**
+
+3. Запуск в контейнере
 
 ```shell
 docker-compose up -d db minio keycloak redis
 ```
-
-3. Скопируйте настройки окружения из **.env-local** в **.env**
 
 4. Установите зависимости
 
