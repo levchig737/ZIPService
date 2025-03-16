@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from fastapi import UploadFile, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from gateways.sonarqube import SonarQubeResults, CheckResult, Vulnerabilities, CodeSmells, Bugs
 # Импорт исключений и классов схем
 from task.exceptions import (
     FileSizeExceededException,
@@ -43,7 +44,21 @@ def mock_current_user() -> dict:
 def task_service() -> Tuple[TaskService, MagicMock, MagicMock]:
     storage_repo = MagicMock()
     task_repo = MagicMock()
-    service = TaskService(storage_repo, task_repo)
+    sonarqube_service = MagicMock()
+
+    # Замокаем асинхронные методы с помощью AsyncMock
+    storage_repo.get_file = AsyncMock(return_value=create_valid_zip_bytes())
+    storage_repo.save_file = AsyncMock()
+    sonarqube_service.check_zip = AsyncMock(return_value=SonarQubeResults(
+        sonarqube=CheckResult(
+            overall_coverage=85.5,
+            bugs=Bugs(total=12, critical=2, major=5, minor=5),
+            code_smells=CodeSmells(total=20, critical=3, major=10, minor=7),
+            vulnerabilities=Vulnerabilities(total=4, critical=1, major=2, minor=1),
+        )
+    ))
+
+    service = TaskService(storage_repo, task_repo, sonarqube_service)
     return service, storage_repo, task_repo
 
 

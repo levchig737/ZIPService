@@ -1,14 +1,17 @@
 import zipfile
 import io
 import logging
-import json
+import json  # Импортируем json для преобразования
 from typing import Optional
 from uuid import uuid4
 
 from fastapi import UploadFile, BackgroundTasks
+from fastapi_cache import FastAPICache
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from base.base import async_session
+from gateways.sonarqube import CheckResult, SonarQubeResults
+from gateways.sonarqube.sonarqube import SonarqubeService
 from task.enums import TaskStatus
 from task.exceptions import (
     FileSizeExceededException,
@@ -19,17 +22,18 @@ from task.exceptions import (
 )
 from task.models import Task
 from task.repositories import StorageRepository, TaskRepository
-from task.schemas import TaskResultResponse, TaskResponse, CheckResult, SonarQubeResults
+from task.schemas import TaskResultResponse, TaskResponse
 
 logger = logging.getLogger("api")
-
 
 class TaskService:
     MAX_FILE_SIZE = 100 * 1024 * 1024
 
-    def __init__(self, storage_repo: StorageRepository, task_repo: TaskRepository):
+    def __init__(self, storage_repo: StorageRepository, task_repo: TaskRepository, sonarqube_service: SonarqubeService):
         self.task_repo = task_repo
         self.storage_repo = storage_repo
+        self.sonarqube_service = sonarqube_service
+        self.cache_namespace = "TASK"
 
     async def create_task(
         self, task_id: str, file: UploadFile, session: AsyncSession = None
@@ -94,6 +98,9 @@ class TaskService:
 
         # Обновление статуса на IN_PROGRESS
         task.status = TaskStatus.IN_PROGRESS
+
+        # await FastAPICache.clear(namespace=self.cache_namespace)
+
         try:
             await self.task_repo.update(task)
         except Exception as e:
@@ -101,18 +108,22 @@ class TaskService:
             raise ProcessingException(message=f"Ошибка обновления статуса: {str(e)}")
         logger.info(f"Статус задачи {task_id} обновлён до IN_PROGRESS")
 
-        # Симуляция анализа через SonarQube (фиктивные данные)
-        results = {
-            "sonarqube": {
-                "overall_coverage": 85.5,
-                "bugs": {"total": 12, "critical": 2, "major": 5, "minor": 5},
-                "code_smells": {"total": 20, "critical": 3, "major": 10, "minor": 7},
-                "vulnerabilities": {"total": 4, "critical": 1, "major": 2, "minor": 1},
-            }
-        }
+        # Получение содержимого ZIP-файла из MinIO
+        try:
+            file_content = await self.storage_repo.get_file(f"{task_id}.zip")  # file_content уже bytes
+        except Exception as e:
+            logger.error(f"Ошибка получения файла из MinIO: {str(e)}")
+            raise ProcessingException(message=f"Ошибка получения файла: {str(e)}")
+
+        # Вызов SonarqubeService для анализа
+        try:
+            results = await self.sonarqube_service.check_zip(file_content)
+        except Exception as e:
+            logger.error(f"Ошибка анализа SonarQube: {str(e)}")
+            raise ProcessingException(message=f"Ошибка анализа SonarQube: {str(e)}")
 
         # Сохранение результатов
-        task.results = json.dumps(results)
+        task.results = json.dumps(results.dict())  # Преобразуем словарь в строку
         task.status = TaskStatus.SUCCESS
         try:
             await self.task_repo.update(task)
@@ -140,7 +151,8 @@ class TaskService:
 
         if task.results:
             try:
-                results_data = json.loads(task.results)
+                # Преобразуем строку из базы обратно в словарь, затем в Pydantic-модель
+                results_data = json.loads(task.results)  # Преобразуем строку в словарь
                 sonarqube_results = results_data.get("sonarqube", {})
                 check_result = (
                     CheckResult(**sonarqube_results) if sonarqube_results else None
@@ -148,8 +160,8 @@ class TaskService:
                 results = (
                     SonarQubeResults(sonarqube=check_result) if check_result else None
                 )
-            except json.JSONDecodeError as e:
-                logger.error(f"Ошибка декодирования JSON: {str(e)}")
+            except Exception as e:
+                logger.error(f"Ошибка обработки результатов: {str(e)}")
                 raise ProcessingException(
                     message=f"Ошибка обработки результатов: {str(e)}"
                 )

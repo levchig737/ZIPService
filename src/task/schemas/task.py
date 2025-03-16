@@ -1,39 +1,9 @@
 from pydantic import BaseModel
 from typing import Optional
 
+from gateways.sonarqube import SonarQubeResults
 from task.enums.TaskStatus import TaskStatus
 
-
-class Bugs(BaseModel):
-    total: int
-    critical: int
-    major: int
-    minor: int
-
-
-class CodeSmells(BaseModel):
-    total: int
-    critical: int
-    major: int
-    minor: int
-
-
-class Vulnerabilities(BaseModel):
-    total: int
-    critical: int
-    major: int
-    minor: int
-
-
-class CheckResult(BaseModel):
-    overall_coverage: float
-    bugs: Bugs
-    code_smells: CodeSmells
-    vulnerabilities: Vulnerabilities
-
-
-class SonarQubeResults(BaseModel):
-    sonarqube: CheckResult
 
 
 class TaskResponse(BaseModel):
