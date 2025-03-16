@@ -1,10 +1,11 @@
-import os
 import io
 import zipfile
 import json
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 from typing import Tuple, Optional
+
+from dotenv import load_dotenv
 from fastapi import UploadFile, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,17 +20,7 @@ from task.enums import TaskStatus
 from task.schemas import TaskResponse
 
 # Установка переменных окружения ДО импорта модулей
-os.environ["DB_HOST"] = "test_host"
-os.environ["DB_PORT"] = "5432"
-os.environ["DB_NAME"] = "test_db"
-os.environ["DB_USER"] = "test_user"
-os.environ["DB_PASS"] = "test_pass"
-os.environ["POSTGRES_PASSWORD"] = "test_postgres_password"
-os.environ["MINIO_NAME"] = "test_minio"
-os.environ["MINIO_PORT"] = "9000"
-os.environ["MINIO_ACCESS_KEY"] = "test_access_key"
-os.environ["MINIO_SECRET_KEY"] = "test_secret_key"
-os.environ["SECRET"] = "test_secret"
+load_dotenv(".env")
 
 from task.services.task_service import TaskService
 
@@ -43,6 +34,9 @@ def create_valid_zip_bytes() -> bytes:
 
 
 # -------------------- Фикстуры --------------------
+@pytest.fixture
+def mock_current_user() -> dict:
+    return {"sub": "test_user_id", "preferred_username": "test_user"}
 
 
 @pytest.fixture

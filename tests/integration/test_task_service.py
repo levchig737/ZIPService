@@ -71,6 +71,20 @@ def setup_containers(request):
     os.environ["MINIO_SECRET_KEY"] = minio.secret_key
     os.environ["SECRET"] = "test_secret"
 
+    os.environ["KEYCLOAK_ADMIN"] = "test_admin"
+    os.environ["KEYCLOAK_ADMIN_PASSWORD"] = "test_password"
+    os.environ["KC_DB"] = "test_db"
+    os.environ["KC_DB_URL"] = "test_db_url"
+    os.environ["KC_DB_USERNAME"] = "test_username"
+    os.environ["KC_DB_PASSWORD"] = "test_password"
+    os.environ["KC_HOSTNAME"] = "test_hostname"
+    os.environ["KC_PORT"] = "8080"
+    os.environ["KEYCLOAK_SERVER_URL"] = "http://test_hostname:8080"
+    os.environ["KEYCLOAK_REALM"] = "test_realm"
+    os.environ["KEYCLOAK_CLIENT_ID"] = "test_client"
+    os.environ["KEYCLOAK_REDIRECT_URI"] = "http://localhost:8000"
+    os.environ["KEYCLOAK_CLIENT_SECRET"] = "test_secret"
+
     # Применение миграций Alembic
     alembic_ini_path = os.path.join(os.path.dirname(__file__), "../alembic.ini")
     alembic_cfg = Config(alembic_ini_path)
@@ -104,13 +118,26 @@ def setup_containers(request):
 
 @pytest.fixture
 async def client():
-    """Создаёт асинхронный HTTP-клиент для тестирования приложения."""
     from main import app
     from httpx import AsyncClient, ASGITransport
+    from task.api.deps import get_current_user
+
+    # Мок для get_current_user
+    async def mock_get_current_user():
+        return {
+            "sub": "test_user_id",
+            "preferred_username": "test_user",
+            "email": "test@example.com",
+        }
+
+    # Переопределяем зависимость get_current_user в приложении
+    app.dependency_overrides[get_current_user] = mock_get_current_user
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client
+        # Очищаем переопределение после теста
+        app.dependency_overrides.clear()
 
 
 # -------------------- Вспомогательные функции --------------------
