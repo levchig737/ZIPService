@@ -1,5 +1,6 @@
 {
   "realm": "zip-service",
+  "enabled": true,
   "clients": [
     {
       "clientId": "${KEYCLOAK_CLIENT_ID}",
@@ -14,6 +15,36 @@
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": true
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "openid",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "test",
+      "email": "test@example.com",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Test",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "test",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["user"],
+      "clientRoles": {
+        "${KEYCLOAK_CLIENT_ID}": ["default-roles-zip-service"]
+      }
     }
   ]
 }
