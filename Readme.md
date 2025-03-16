@@ -52,7 +52,8 @@ docker-compose up -d
 1. Клонируйте репозиторий
 
 ```shell
-git clone https://github.com/levchig737/ZIPService.git && cd ZIPService
+git clone https://github.com/levchig737/ZIPService.git 
+cd ZIPService
 ```
 
 2. Запуск в контейнере
@@ -66,6 +67,7 @@ docker-compose up -d db minio keycloak redis
 4. Установите зависимости
 
 ```shell
+python.exe -m pip install --upgrade pip
 pip install poetry
 poetry update
 ```
