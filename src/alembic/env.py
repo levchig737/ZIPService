@@ -8,7 +8,7 @@ from alembic import context
 from base import Base
 from settings import Settings
 
-settings = Settings()
+settings = Settings()  # type: ignore
 
 
 # this is the Alembic Config object, which provides

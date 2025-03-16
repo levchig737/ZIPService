@@ -5,7 +5,7 @@ from settings import Settings
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
-settings = Settings()
+settings = Settings()  # type: ignore
 DATABASE_URL = (
     f"postgresql+asyncpg://{settings.DB_USER}:{settings.DB_PASS}"
     f"@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"

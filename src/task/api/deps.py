@@ -11,7 +11,7 @@ from task.exceptions import AccessDeniedException
 from task.repositories import StorageRepository, TaskRepository
 from task.services.task_service import TaskService
 
-settings = Settings()
+settings = Settings()  # type: ignore
 
 
 async def get_minio_client() -> Minio:

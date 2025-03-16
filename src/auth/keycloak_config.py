@@ -2,7 +2,7 @@ from fastapi.security import OAuth2AuthorizationCodeBearer
 from keycloak import KeycloakOpenID
 from settings import Settings
 
-settings = Settings()
+settings = Settings()  # type: ignore
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl=f"{settings.KEYCLOAK_PUBLIC_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/auth",

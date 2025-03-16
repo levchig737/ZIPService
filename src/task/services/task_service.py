@@ -42,7 +42,7 @@ class TaskService:
         self.cache_namespace = "TASK"
 
     async def create_task(
-        self, task_id: str, file: UploadFile, session: AsyncSession = None
+        self, task_id: str, file: UploadFile, session: Optional[AsyncSession] = None
     ) -> None:
         logger.info(f"Создание задачи с id: {task_id}")
 
@@ -93,7 +93,9 @@ class TaskService:
             f"Задача {task_id} создана в базе данных со статусом: {task.status}"
         )
 
-    async def process_task(self, task_id: str, session: AsyncSession = None) -> None:
+    async def process_task(
+        self, task_id: str, session: Optional[AsyncSession] = None
+    ) -> None:
         if session is not None:
             self.task_repo.session = session
 
@@ -103,7 +105,7 @@ class TaskService:
             return
 
         # Обновление статуса на IN_PROGRESS
-        task.status = TaskStatus.IN_PROGRESS
+        task.status = TaskStatus.IN_PROGRESS  # type: ignore[assignment]
 
         await FastAPICache.clear(namespace=self.cache_namespace)
 
@@ -131,8 +133,8 @@ class TaskService:
             raise ProcessingException(message=f"Ошибка анализа SonarQube: {str(e)}")
 
         # Сохранение результатов
-        task.results = json.dumps(results.dict())  # Преобразуем словарь в строку
-        task.status = TaskStatus.SUCCESS
+        task.results = json.dumps(results.dict())  # type: ignore[assignment]
+        task.status = TaskStatus.SUCCESS  # type: ignore[assignment]
         await FastAPICache.clear(namespace=self.cache_namespace)
 
         try:
@@ -147,7 +149,7 @@ class TaskService:
         )
 
     async def get_task_result(
-        self, task_id: str, session: AsyncSession = None
+        self, task_id: str, session: Optional[AsyncSession] = None
     ) -> Optional[TaskResultResponse]:
         logger.info(f"Получение результата для task_id: {task_id}")
 
@@ -162,7 +164,9 @@ class TaskService:
         if task.results:
             try:
                 # Преобразуем строку из базы обратно в словарь, затем в Pydantic-модель
-                results_data = json.loads(task.results)  # Преобразуем строку в словарь
+                results_data = json.loads(
+                    str(task.results)
+                )  # Преобразуем строку в словарь
                 sonarqube_results = results_data.get("sonarqube", {})
                 check_result = (
                     CheckResult(**sonarqube_results) if sonarqube_results else None
@@ -178,7 +182,7 @@ class TaskService:
         else:
             results = None
 
-        return TaskResultResponse(status=task.status, results=results)
+        return TaskResultResponse(status=task.status, results=results)  # type: ignore
 
     async def upload_and_process_file(
         self, file: UploadFile, background_tasks: BackgroundTasks, session: AsyncSession

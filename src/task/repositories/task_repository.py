@@ -14,7 +14,7 @@ class TaskRepository(BaseRepository):
         await self.save(task)
 
     async def get(self, task_id: str) -> Optional[Task]:
-        statement = select(Task).where(task_id == Task.task_id)
+        statement = select(Task).where(task_id == Task.task_id)  # type: ignore
         return await self.one_or_none(statement)
 
     async def update(self, task: Task) -> None:
