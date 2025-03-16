@@ -86,7 +86,8 @@ python main.py
 
 ### Аутентификация в Keycloak Swagger
 Для аутентификации в Swagger необходимо вставить из **.env** **KEYCLOAK_CLIENT_ID** и **KEYCLOAK_CLIENT_SECRET** в соответствующие поля
-Тестовый пользователь:
+
+**Тестовый пользователь:**
 - login: test
 - password: test
 
