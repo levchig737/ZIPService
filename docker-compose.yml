@@ -1,0 +1,99 @@
+services:
+  db:
+    image: postgres:16.1
+    container_name: db
+    env_file:
+      - .env
+    user: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./fixtures/init-db-postgres.sql:/docker-entrypoint-initdb.d/init.sql
+      - zip_service-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      zip_service-network:
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"
+    command: server /data
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zip_service-network
+
+  keycloak:
+    image: keycloak/keycloak:26.1
+    container_name: keycloak
+    env_file:
+      - .env
+    command: start-dev --db=${KC_DB} --db-url=${KC_DB_URL} --db-username=${KC_DB_USERNAME} --db-password=${KC_DB_PASSWORD} --hostname=localhost --hostname-strict=false --import-realm
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./fixtures/client-config.json:/opt/keycloak/data/import/client-config.json
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - zip_service-network
+
+  app:
+    build:
+      context: .
+    restart: always
+    env_file:
+      - .env
+    container_name: zip_service_app
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    depends_on:
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: bash -c "while !</dev/tcp/db/5432; do sleep 1; done; sleep 2; alembic upgrade head && uvicorn main:app --host ${APP_HOST} --port ${APP_PORT}"
+    healthcheck:
+      test: bash -c "</dev/tcp/app/${APP_PORT}"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      zip_service-network:
+
+  redis:
+    image: redis:7.0
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zip_service-network
+
+volumes:
+  zip_service-pg:
+
+networks:
+  zip_service-network:
+    name: zip_service-network

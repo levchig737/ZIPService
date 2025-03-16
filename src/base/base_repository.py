@@ -1,8 +1,6 @@
 import abc
 from typing import Any, Generic, Iterable, Optional, TypeVar
 
-from fastapi_pagination import Page
-from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy import Delete, Insert, Select, Update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,9 +13,6 @@ class BaseRepository(abc.ABC, Generic[T]):
 
     async def all(self, statement: Select | Delete | Update | Insert) -> Iterable[Any]:
         return (await self.session.execute(statement)).scalars().all()
-
-    async def paginate(self, statement: Select, **kwargs: Any) -> Page:
-        return await paginate(self.session, statement, **kwargs)
 
     async def one_or_none(
         self, statement: Select | Delete | Update | Insert
