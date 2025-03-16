@@ -1,10 +1,9 @@
-from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, Security
 from keycloak import KeycloakAuthenticationError
 from minio import Minio
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from auth.keycloak_config import keycloak_openid
+from auth.keycloak_config import keycloak_openid, oauth2_scheme
 from base.base import get_async_session
 from settings import Settings
 from task.exceptions import AccessDeniedException
@@ -41,7 +40,7 @@ async def get_task_service(
 ) -> TaskService:
     return TaskService(storage_repo=storage_repo, task_repo=task_repo)
 
-async def get_current_user(token: str = Depends(OAuth2PasswordBearer(tokenUrl=f"http://{settings.KC_HOSTNAME}:{settings.KC_PORT}/auth/realms/zip-service-realm/protocol/openid-connect/token"))) -> dict:
+async def get_current_user(token: str = Security(oauth2_scheme)) -> dict:
     try:
         userinfo = keycloak_openid.userinfo(token)
         return userinfo

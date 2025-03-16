@@ -39,9 +39,11 @@ services:
     container_name: keycloak
     env_file:
       - .env
-    command: start-dev --db=${KC_DB} --db-url=${KC_DB_URL} --db-username=${KC_DB_USERNAME} --db-password=${KC_DB_PASSWORD} --hostname=${KC_HOSTNAME}
+    command: start-dev --db=${KC_DB} --db-url=${KC_DB_URL} --db-username=${KC_DB_USERNAME} --db-password=${KC_DB_PASSWORD} --hostname=${KC_HOSTNAME} --import-realm
     ports:
       - "8080:8080"
+    volumes:
+      - ./fixtures/client-config.json:/opt/keycloak/data/import/client-config.json
     depends_on:
       db:
         condition: service_healthy

@@ -20,6 +20,7 @@ async def upload_file(
     file: UploadFile,
     background_tasks: BackgroundTasks,
     task_service: TaskServiceDeps,
+    current_user: UserDeps,
     session: AsyncSession = Depends(get_async_session),
 ) -> TaskResponse:
     return await task_service.upload_and_process_file(file, background_tasks, session)
@@ -29,6 +30,7 @@ async def upload_file(
 async def get_results(
     task_id: str,
     task_service: TaskServiceDeps,
+    current_user: UserDeps,
     session: AsyncSession = Depends(get_async_session),
 ) -> TaskResultResponse:
     result = await task_service.get_task_result(task_id, session)

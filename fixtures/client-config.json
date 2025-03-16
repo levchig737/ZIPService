@@ -1,0 +1,19 @@
+{
+  "realm": "zip-service",
+  "clients": [
+    {
+      "clientId": "${KEYCLOAK_CLIENT_ID}",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${KEYCLOAK_CLIENT_SECRET}",
+      "redirectUris": ["${KEYCLOAK_REDIRECT_URI}"],
+      "webOrigins": ["+"],
+      "protocol": "openid-connect",
+      "defaultClientScopes": ["openid", "profile", "email"],
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true
+    }
+  ]
+}
