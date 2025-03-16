@@ -6,7 +6,7 @@ settings = Settings()
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl=f"{settings.KEYCLOAK_PUBLIC_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/auth",
-    tokenUrl=f"{settings.KEYCLOAK_SERVER_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/token",
+    tokenUrl=f"{settings.KEYCLOAK_PUBLIC_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/token",
 )
 
 keycloak_openid = KeycloakOpenID(

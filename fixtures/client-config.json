@@ -8,7 +8,7 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "${KEYCLOAK_CLIENT_SECRET}",
       "redirectUris": ["${KEYCLOAK_REDIRECT_URI}"],
-      "webOrigins": ["+"],
+      "webOrigins": ["*"],
       "protocol": "openid-connect",
       "defaultClientScopes": ["openid", "profile", "email"],
       "publicClient": false,
